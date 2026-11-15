@@ -1,0 +1,70 @@
+==== 1. PARAMETROS ====
+Ke = Kt = 0.01090 V.s/rad,  b = 1.5625e-06 N.m.s/rad
+Jb = 1.0625e-02 kg.m^2,  Jeff (por rueda) = 4.5264e-03 kg.m^2
+Masa equivalente  M  = 10.071 kg   (carro: 1.50 kg)
+Inercia equiv.    Jz = 0.0588 kg.m^2 (chasis: 0.0106)
+
+==== 2. MODELO COMPLETO ====
+Af =
+      -0.2743      0.0000      0.9988      0.9988
+       0.0000     -0.3395    -12.8225     12.8225
+   -4023.5428    301.7657  -1600.0000     -0.0000
+   -4023.5428   -301.7657     -0.0000  -1600.0000
+Bf = diag(1/L) en las filas de corriente: 1/L = 400.0
+Polos: [-5.31458 -1594.96 -5.19203 -1595.15]
+
+==== 3. MODELO REDUCIDO ====
+A = [  -5.2978    0.0000;    0.0000   -5.1763]
+B = [   0.2497    0.2497;   -3.2056    3.2056]
+Polos reducido: [-5.29783 -5.17628]
+Velocidad maxima con 12 V en ambos motores: 1.131 m/s
+
+==== 4. ANALISIS ====
+rango(ctrb(A,B))  = 2 de 2
+rango(obsv(A,Cm)) = 2 de 2
+Matriz de transferencia G(s) = Y(s)/U(s):
+  G11(s) = 0.24971 / [1 5.2978]
+  G12(s) = 0.24971 / [1 5.2978]
+  G21(s) = -3.2056 / [1 5.1763]
+  G22(s) = 3.2056 / [1 5.1763]
+Ganancia DC G(0) = [  0.0471   0.0471;  -0.6193   0.6193]
+(cada voltaje afecta a v y a W: sistema acoplado 2x2)
+
+==== 5. LQR DISCRETO MIMO ====
+Ts = 0.010 s
+rango(ctrb aumentado) = 4 de 4
+Q = diag([20 20 600 1000]), R = 0.01*I
+K (2x4) = [Kx | Kz]:
+  [  30.2818  -13.5960 |  -159.9589    90.8765]
+  [  30.2818   13.5960 |  -159.9589   -90.8765]
+Polos z: [0.94648 0.93173 0.85463 0.16833]
+Polos s equivalentes: [-5.5008 -7.0716 -15.709 -178.18]
+
+==== 6. KALMAN ====
+rango(obsv(Ade,Ce)) = 4 de 4
+Resolucion de velocidad del encoder = 0.4760 rad/s por rueda
+Polos del estimador |z|: [0.6094 0.6094 0.7741 0.7741]
+M (4x3) =
+     0.0099    0.0099   -0.0000
+    -0.0043    0.0043    0.3492
+     0.3600    0.3600    0.0000
+    -0.1056    0.1056    8.6417
+
+==== 7. PI POR RUEDA ====
+Kp = 0.30 V.s/rad, Ki = 3.00 V/rad (iguales en ambas ruedas)
+
+==== 8. SIMULACION NO LINEAL ====
+Planta: motor derecho con Kt,Ke x0.92 y R x1.05; Coulomb; sat. +-12 V
+
+==== 9. RESULTADOS ====
+Metrica                                      Especif.   LQR MIMO       2 PI
+A: ts de v (2%) [s]                            <= 1.0      0.750      0.790
+A: sobrepaso de v [%]                            <= 5       0.16       7.37
+A: |W| max. inducido por el escalon de v            -      0.035      0.126
+B: ts de W (5%) [s]                            <= 1.0      0.460      0.650
+B: sobrepaso de W [%]                           <= 10       2.35       7.34
+B: |v - v*| max. durante el giro [m/s]              -     0.0012     0.0014
+C: |v - v*| max. por la pendiente [m/s]             -     0.0118     0.0184
+C: |W| max. por el freno en una rueda               -      0.143      0.467
+C: rumbo final psi [rad] (ideal 2.000)          2.000      1.986      1.864
+|u| maximo en todas las pruebas [V]             <= 12       8.19       8.04

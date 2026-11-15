@@ -1,0 +1,60 @@
+==== 1. PARAMETROS ====
+Ke = Kt = 0.01090 V.s/rad
+b       = 1.5625e-06 N.m.s/rad
+Jw      = 2.6406e-05 kg.m^2
+Jeq     = 5.0293e-06 kg.m^2
+tau_e = L/R = 0.625 ms
+tau_m = Jeq*R/(Kt*Ke) = 0.169 s
+
+==== 2. MODELO ====
+A =
+        0.0000       1.0000       0.0000
+        0.0000      -0.3107      72.2235
+        0.0000    -130.7651   -1600.0000
+B = [0; 0; 400]
+E = [0; -220.926; 0]
+C = [1 0 0], D = 0
+
+G(s) = theta(s)/U(s): num = [0 0 0 28889.4]
+                      den = [1 1600.31 9941.38 0]
+
+==== 3. ANALISIS LAZO ABIERTO ====
+Polos de lazo abierto: [0 -6.23646 -1594.07]
+rango(ctrb) = 3 de 3  -> controlable
+rango(obsv) = 3 de 3  -> observable
+det(ctrb) = -3.3384e+11, det(obsv) = 7.2223e+01
+
+==== 4. VALIDACION (escalon 12 V) ====
+Velocidad final modelo = 333.0 rpm (hoja de datos: 333 rpm)
+Corriente final modelo = 0.150 A  (hoja de datos: 0.15 A)
+Corriente de arranque  = 2.95 A  (V/R = 3.00 A)
+
+==== 5. SISTEMA AUMENTADO ====
+rango(ctrb aumentado) = 4 de 4
+
+==== 6. UBICACION DE POLOS ====
+Polos deseados: [-8+6i -8-6i -40 -1600]
+K = [k1 k2 k3 ki] = [41.1224 2.78238 0.139223 -221.535]
+Polos obtenidos: [-1600 -8+6i -8-6i -40]
+
+==== 7. LQR ====
+Q = diag([50 0.5 0 8000]), R = 0.3
+K = [k1 k2 k3 ki] = [30.177 1.93349 0.0863454 -163.299]
+Polos de lazo cerrado: [-9.1488+6.8543i -9.1488-6.8543i -22.649 -1593.9]
+
+==== 8. OBSERVADOR ====
+rango(obsv aumentado) = 4 de 4
+Polos del observador: [-50 -60 -70 -1600]
+L = [179.689 1199.86 185727 -950.545]
+
+==== 9. RESULTADOS (escalon de pi rad) ====
+Metrica                        Especif.      Polos        LQR  LQR+obs+sat
+Tiempo de establec. [s]          <= 0.5      0.406      0.391        0.391
+Sobrepaso [%]                      <= 5       1.46       1.21         1.20
+Error final [rad]                     0     0.0000     0.0000       0.0001
+|u| maximo [V]                    <= 12      10.79      10.64        10.64
+|i| maxima [A]                        -       2.30       2.20         2.20
+Desv. max. por TL [rad]               -     0.0700     0.0981       0.1184
+
+TL estimado al final = 0.2999 N.m (real = 0.30 N.m)
+Error max. de estimacion de i = 0.725 A
